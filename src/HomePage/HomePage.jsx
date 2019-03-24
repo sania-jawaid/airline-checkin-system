@@ -26,7 +26,7 @@ class HomePage extends React.Component {
                 <p>
                     <Link to="/checkin">Web Checkin</Link>
                 </p>
-                <h3>All passengers:</h3>
+                <h3>List of all passengers:</h3>
                 {users.loading && <em>Loading users...</em>}
                 {users.error && <span className="text-danger">ERROR: {users.error}</span>}
                 {users.items &&

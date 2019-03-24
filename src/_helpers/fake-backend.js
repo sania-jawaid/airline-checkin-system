@@ -12,7 +12,6 @@ export function configureFakeBackend() {
                 if (url.endsWith('/users/authenticate') && opts.method === 'POST') {
                     // get parameters from post request
                     let params = JSON.parse(opts.body);
-
                     // find if any user matches login credentials
                     let filteredUsers = users.filter(user => {
                         return user.ticket_number === params.ticket_number && user.password === params.password;

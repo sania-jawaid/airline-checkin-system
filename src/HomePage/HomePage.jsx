@@ -18,8 +18,15 @@ class HomePage extends React.Component {
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h1>Hi {user.firstName}!</h1>
-                <p>You're logged in with React!!</p>
-                <h3>All registered users:</h3>
+                <p>Your Booking details are:</p>
+                <p>
+                    <b>Ticket Number: </b> {user.ticket_number} <br/>
+                    <b>Email: </b> {user.email}
+                </p>
+                <p>
+                    <Link to="/checkin">Web Checkin</Link>
+                </p>
+                <h3>All passengers:</h3>
                 {users.loading && <em>Loading users...</em>}
                 {users.error && <span className="text-danger">ERROR: {users.error}</span>}
                 {users.items &&
@@ -36,6 +43,7 @@ class HomePage extends React.Component {
                         )}
                     </ul>
                 }
+
                 <p>
                     <Link to="/login">Logout</Link>
                 </p>

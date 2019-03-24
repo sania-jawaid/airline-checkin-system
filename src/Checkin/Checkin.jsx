@@ -11,23 +11,37 @@ class Checkin extends React.Component {
         super(props);
         let seats=[];
         let types=['Left', 'Center', 'Right'];
+        let price = {'Front': {'Window': 120, 'Middle': 100, 'Aisle': 110 }, 'Middle': {'Window': 100, 'Middle': 80, 'Aisle': 100 }, 'Back': {'Window': 120, 'Middle': 100, 'Aisle': 110 }}
         var i,j;
         for(i=1; i<= 3; i++){
             let row_wise_seats=[];
-            for(j=1; j<=10; j++){
+            for(j=1; j<=12; j++){
                 row_wise_seats.push({seat_number: j, label: `${i} IJK ${j}`})
             }
             seats.push({row: i, row_wise_seats: row_wise_seats, label: types[i-1]})
         }
-        this.state = {seats: seats};
+        this.state = {seats: seats, price: price};
     }
     componentDidMount() {
 
         this.props.dispatch(userActions.getAll());
     }
 
-    handleDeleteUser(id) {
-        return (e) => this.props.dispatch(userActions.delete(id));
+    calculatePrice(btn, side, seatNumber){
+        debugger
+        let row = Math.ceil(seatNumber/4)
+        btn.disabled=true
+        let aisle="Middle"
+        if (seatNumber % 4 == 1){
+            aisle="Window"
+        }else if(seatNumber % 4 == 0){
+            aisle="Aisle"
+        }
+        let price = this.state.price[side][aisle];
+        if (row == 1){
+            price += 50
+        }
+        alert('Total Price is: '+price)
     }
 
     render() {
@@ -86,9 +100,14 @@ class Checkin extends React.Component {
                                     <div className="container">
                                         <div className="row">
                                             {seat.row_wise_seats.map((row_wise_seat, index) =>
+
                                                 <div id={row_wise_seat.seat_number} className='col-md-2'>
-                                                    <button title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
+                                                    <button
+                                                        onClick={(e) => this.calculatePrice(e.target, 'Front' , row_wise_seat.seat_number)}
+                                                        title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
                                                 </div>
+
+
                                             )}
                                         </div>
 
@@ -114,7 +133,7 @@ class Checkin extends React.Component {
                                         <div className="row">
                                             {seat.row_wise_seats.map((row_wise_seat, index) =>
                                                 <div id={row_wise_seat.seat_number} className='col-md-2'>
-                                                    <button title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
+                                                    <button onClick={(e) => this.calculatePrice(e.target, 'Middle', row_wise_seat.seat_number)} title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
                                                 </div>
                                             )}
                                         </div>
@@ -141,7 +160,7 @@ class Checkin extends React.Component {
                                         <div className="row">
                                             {seat.row_wise_seats.map((row_wise_seat, index) =>
                                                 <div id={row_wise_seat.seat_number} className='col-md-2'>
-                                                    <button title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
+                                                    <button onClick={(e) => this.calculatePrice(e.target, 'Back',  row_wise_seat.seat_number)} title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
                                                 </div>
                                             )}
                                         </div>
@@ -154,6 +173,9 @@ class Checkin extends React.Component {
                 </div>
 
                 <br/><br/>
+                <p>
+                    <Link to="/checkout">Continue to Checkout</Link>
+                </p>
                 <p>
                     <Link to="/">Go Back</Link>
                 </p>

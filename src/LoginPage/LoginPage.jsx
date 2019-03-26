@@ -48,7 +48,7 @@ class LoginPage extends React.Component {
                         <label htmlFor="ticket_number">Ticket Number</label>
                         <input type="text" className="form-control" name="ticket_number" value={ticket_number} onChange={this.handleChange} />
                         {submitted && !ticket_number &&
-                            <div className="help-block">ticket number is required</div>
+                            <div className="help-block">Ticket number is required</div>
                         }
                     </div>
                     <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>

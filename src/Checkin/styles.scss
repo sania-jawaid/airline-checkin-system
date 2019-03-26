@@ -1,0 +1,8 @@
+  .checkin {
+    button{
+      margin: 5px;
+    }
+    button[disabled]{
+      background: grey;
+    }
+  }

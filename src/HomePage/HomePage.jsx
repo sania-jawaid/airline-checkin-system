@@ -24,9 +24,9 @@ class HomePage extends React.Component {
                     <b>Email: </b> {user.email}
                 </p>
                 <p>
-                    <Link to="/checkin">Web Checkin</Link>
+                    <Link className="btn btn-primary" to="/checkin">Do Web Checkin</Link>
                 </p>
-                <h3>List of all passengers:</h3>
+                <h3>List of all other passengers:</h3>
                 {users.loading && <em>Loading users...</em>}
                 {users.error && <span className="text-danger">ERROR: {users.error}</span>}
                 {users.items &&

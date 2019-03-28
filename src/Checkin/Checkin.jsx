@@ -2,9 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { userActions } from '../_actions';
-
-import {  Button } from 'react-bootstrap';
+import { bookingActions } from '../_actions';
 
 import './styles.scss'
 
@@ -23,10 +21,6 @@ class Checkin extends React.Component {
             seats.push({row: i, row_wise_seats: row_wise_seats, label: types[i-1]})
         }
         this.state = {seats: seats, priceList: priceList, seatPrice: 0, priceToBePaid: 0, foodPrice: {veg: 300, nonVeg: 450}};
-    }
-    componentDidMount() {
-
-        this.props.dispatch(userActions.getAll());
     }
 
     calculatePrice(btn, side, aisle, seatNumber){
@@ -53,8 +47,17 @@ class Checkin extends React.Component {
         this.setState({priceToBePaid: this.state.seatPrice + amount})
     }
 
+    makeBookingOnHold(){
+        const { dispatch } = this.props;
+        if (this.state.selectedSeat && this.state.priceToBePaid) {
+            let seatInfo = this.state.selectedSeat
+            delete seatInfo.btn
+            dispatch(bookingActions.holdBooking({seatInfo: seatInfo, seatPrice: this.state.priceToBePaid}));
+        }
+    }
+
     render() {
-        const { user, users } = this.props;
+        const { booking  } = this.props;
         return (
             <div className="checkin">
                 <div className="col-md-8">
@@ -104,14 +107,14 @@ class Checkin extends React.Component {
                             <div className="row">
 
                                 {this.state.seats.map((seat, index) =>
-                                    <div id={seat.row} className='col-md-3'>
+                                    <div id={seat.row} className='col-md-4'>
                                         {seat.label + ' Aisle '}
                                         <br/>
                                         <div className="container">
                                             <div className="row">
                                                 {seat.row_wise_seats.map((row_wise_seat, index) =>
 
-                                                    <div id={row_wise_seat.seat_number} className='col-md-2'>
+                                                    <div id={row_wise_seat.seat_number} className='col-md-3 seat'>
                                                         <button
                                                             onClick={(e) => this.calculatePrice(e.target, 'Front' , seat.label,  row_wise_seat.seat_number)}
                                                             title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
@@ -136,13 +139,13 @@ class Checkin extends React.Component {
                             <div className="row">
 
                                 {this.state.seats.map((seat, index) =>
-                                    <div id={seat.row} className='col-md-3'>
+                                    <div id={seat.row} className='col-md-4'>
                                         {seat.label + ' Aisle '}
                                         <br/>
                                         <div className="container">
                                             <div className="row">
                                                 {seat.row_wise_seats.map((row_wise_seat, index) =>
-                                                    <div id={row_wise_seat.seat_number} className='col-md-2'>
+                                                    <div id={row_wise_seat.seat_number} className='col-md-3 seat'>
                                                         <button onClick={(e) => this.calculatePrice(e.target, 'Middle', seat.label, row_wise_seat.seat_number)} title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
                                                     </div>
                                                 )}
@@ -163,13 +166,13 @@ class Checkin extends React.Component {
                             <div className="row">
 
                                 {this.state.seats.map((seat, index) =>
-                                    <div id={seat.row} className='col-md-3'>
+                                    <div id={seat.row} className='col-md-4'>
                                         {seat.label + ' Aisle '}
                                         <br/>
                                         <div className="container">
                                             <div className="row">
                                                 {seat.row_wise_seats.map((row_wise_seat, index) =>
-                                                    <div id={row_wise_seat.seat_number} className='col-md-2'>
+                                                    <div id={row_wise_seat.seat_number} className='col-md-3 seat'>
                                                         <button onClick={(e) => this.calculatePrice(e.target, 'Back', seat.label, row_wise_seat.seat_number)} title={'Seat Number: ' + row_wise_seat.label}>{row_wise_seat.seat_number} </button>
                                                     </div>
                                                 )}
@@ -205,22 +208,25 @@ class Checkin extends React.Component {
                     <h2>Rs. {this.state.priceToBePaid}</h2>
                     <br/>
                     <p>
-                        <Link className="btn btn-primary" to="/checkout" disabled={this.state.priceToBePaid == 0}>Continue to Checkout</Link>
+                        <button className="btn btn-primary" onClick={() => this.makeBookingOnHold()} disabled={this.state.priceToBePaid == 0}>Continue to Checkout</button>
                     </p>
+                    {booking &&
+                    <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                    }
                 </div>
             </div>
         );
     }
 }
 
+
+const connectedCheckinPage = connect(mapStateToProps)(Checkin);
+export { connectedCheckinPage as Checkin };
+
 function mapStateToProps(state) {
-    const { users, authentication } = state;
-    const { user } = authentication;
+    const { booking } = state.booking;
     return {
-        user,
-        users
+        booking
     };
 }
 
-const connectedHomePage = connect(mapStateToProps)(Checkin);
-export { connectedHomePage as Checkin };

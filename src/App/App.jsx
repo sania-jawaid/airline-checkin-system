@@ -8,7 +8,7 @@ import { PrivateRoute } from '../_components';
 import { HomePage } from '../HomePage';
 import { LoginPage } from '../LoginPage';
 import { Checkin } from '../Checkin';
-import { Checkout } from '../Checkin';
+import { Checkout } from '../Checkout';
 import { RegisterPage } from '../RegisterPage';
 
 class App extends React.Component {

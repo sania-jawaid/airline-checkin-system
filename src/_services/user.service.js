@@ -8,6 +8,8 @@ export const userService = {
     getAll,
     getById,
     update,
+    holdBooking,
+    confirmBooking,
     delete: _delete
 };
 
@@ -31,6 +33,7 @@ function login(ticket_number, password) {
 function logout() {
     // remove user from local storage to log user out
     localStorage.removeItem('user');
+    localStorage.removeItem('seatDetails');
 }
 
 function getAll() {
@@ -59,6 +62,33 @@ function register(user) {
     };
 
     return fetch(`${config.apiUrl}/users/register`, requestOptions).then(handleResponse);
+}
+
+function holdBooking(seatDetails) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seatDetails })
+    };
+
+    return fetch(`${config.apiUrl}/users/hold_booking`, requestOptions).then(
+        seatDetails => {
+            return seatDetails;
+        }
+    );
+}
+
+function confirmBooking(userId) {
+    const requestOptions = {
+        method: 'POST',
+        headers: authHeader()
+    };
+
+    return fetch(`${config.apiUrl}/users/confirm_booking/${userId}`, requestOptions).then(
+        seatDetails => {
+            return seatDetails;
+        }
+    );
 }
 
 function update(user) {

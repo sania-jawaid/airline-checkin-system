@@ -93,6 +93,61 @@ export function configureFakeBackend() {
                     return;
                 }
 
+                // hold seat for user
+                if (url.endsWith('/users/hold_booking') && opts.method === 'POST') {
+                    // get new user object from post body
+                    let params = JSON.parse(opts.body);
+                    localStorage.setItem('seatDetails', JSON.stringify(params.seatDetails));
+
+                    // respond 200 OK
+                    resolve({ ok: true, text: () => Promise.resolve() });
+
+                    return;
+                }
+
+                // confirm seats for user
+                if (url.match(/\/users\/confirm_booking\/\d+$/) && opts.method === 'POST') {
+                    if (opts.headers && opts.headers.Authorization === 'Bearer fake-jwt-token') {
+                        // find user by id in users array
+                        let urlParts = url.split('/');
+                        let id = parseInt(urlParts[urlParts.length - 1]);
+
+                        // get seatInfo object from post body
+                        let seatDetails = localStorage.getItem('seatDetails');
+                        seatDetails = JSON.parse(seatDetails);
+
+                        // validation
+                        let duplicateSeat = users.filter(user => {
+                            return user.seatDetails && user.seatDetails.seatInfo.label == seatDetails.seatInfo.label
+                        }).length;
+
+                        if (duplicateSeat) {
+                            reject('Seat: "' + seatDetails.seatInfo.label + '" is already taken');
+                            return;
+                        }
+
+                        // save seatInfo for user
+                        for (let i = 0; i < users.length; i++) {
+                            let user = users[i];
+                            if (user.id === id) {
+                                users[i].seatDetails = seatDetails;
+                                localStorage.setItem('users', JSON.stringify(users));
+                                break;
+                            }
+                        }
+
+                        // respond 200 OK
+                        resolve({ok: true, text: () => Promise.resolve()});
+                    } else {
+                        // return 401 not authorised if token is null or invalid
+                        reject('Unauthorised');
+                    }
+
+                    return;
+                }
+
+
+
                 // delete user
                 if (url.match(/\/users\/\d+$/) && opts.method === 'DELETE') {
                     // check for fake auth token in header and return user if valid, this security is implemented server side in a real application
